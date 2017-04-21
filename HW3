@@ -1,0 +1,88 @@
+class(iris)
+dim(iris)
+colnames(iris)
+
+iris[,order(colnames(iris))]; #Task 1
+
+write.table(iris[1:12,], file = "hw3a32.xls", sep ="\t", quote=FALSE, col.names=NA ) #Task 2
+
+read.delim("hw3a3changes.txt", header=TRUE,sep="\t") #Task 3
+
+
+#Question part B
+
+plot(iris$Sepal.Length, iris$Sepal.Width, main ="Scatter plot", xlim=c(4,12),ylim=c(1.2,10),
+     pch=21, bg=c("red","green","blue") [unclass(iris$Species)])
+
+Setosa <- iris[1:50, c("Petal.Length","Petal.Width","Sepal.Length","Sepal.Width")]
+Versi <- iris[51:100,c("Petal.Length","Petal.Width","Sepal.Length","Sepal.Width")]
+Virginica <- iris[101:150,c("Petal.Length","Petal.Width","Sepal.Length","Sepal.Width")]
+
+Setosa_Mean <- colMeans(Setosa)
+Versi_Mean <- colMeans(Versi)
+Virginica_Mean <- colMeans(Virginica)
+Iris_Mean <-rbind(Setosa_Mean,Versi_Mean,Virginica_Mean)
+
+#Question part C
+
+barplot(Iris_Mean, beside = TRUE,legend = rownames(Iris_Mean), main = "Iris Bar" )
+barplot(Iris_Mean, beside = FALSE,legend = rownames(Iris_Mean), main = "Iris Bar" )
+
+
+#Parts D through H
+
+setwd("C:/Users/jorda_000/Desktop/R homework scripts")
+my_mw <- read.delim(file="MolecularWeight_tair7.xls", header=T, sep="\t") 
+my_mw[1:2,]
+
+my_target <- read.delim(file="TargetP_analysis_tair7.xls", header=T, sep="\t") 
+my_target[1:2,]
+
+my_mw <- read.delim(file="http://faculty.ucr.edu/~tgirke/Documents/R_BioCond/Samples/MolecularWeight_tair7.xls", header=T, sep="\t") 
+my_mw[1:2,]
+
+my_target <- read.delim(file="http://faculty.ucr.edu/~tgirke/Documents/R_BioCond/Samples/TargetP_analysis_tair7.xls", header=T, sep="\t") 
+my_target[1:2,]
+
+
+colnames(my_target)[1] <- "ID"
+colnames(my_mw)[1] <- "ID" 
+
+
+my_mw_target <- merge(my_mw, my_target, by.x="ID", by.y="ID", all.x=T)
+my_mw_target2a <- merge(my_mw, my_target[1:40,], by.x="ID", by.y="ID", all.x=T)  # To remove non-matching rows, use the argument setting 'all=F'.
+my_mw_target2 <- na.omit(my_mw_target2a) # Removes rows containing "NAs" (non-matching rows).
+
+
+#method 2
+my_mw_target2a <- merge(my_mw, my_target[1:40,], by.x="ID", by.y="ID", all.x=F)
+
+#3E replacing NA with 0
+my_mw_target2a[my_mw_target2a == is.na] <- 0
+
+query <- my_mw_target[my_mw_target[, 2] > 100000 & my_mw_target[, 4] == "C", ] 
+query[1:4, ]
+
+#3F Finding Mw between 4000 and 5000
+subset(my_mw_target, MW >4000 & MW < 5000 )
+
+#Step 6
+my_mw_target3 <- data.frame(loci=gsub("\\..*", "", as.character(my_mw_target[,1]), perl = TRUE), my_mw_target)
+my_mw_target3[1:3,1:8]
+
+#3G I'm afraid I don't understand.
+
+
+#Step 7
+mycounts <- table(my_mw_target3[,1])[my_mw_target3[,1]]
+my_mw_target4 <- cbind(my_mw_target3, Freq=mycounts[as.character(my_mw_target3[,1])]) 
+
+data.frame(my_mw_target4, avg_AA_WT=(my_mw_target4[,3] / my_mw_target4[,4]))[1:2,5:11] 
+
+mymean <- apply(my_mw_target4[,6:9], 1, mean)
+mystdev <- apply(my_mw_target4[,6:9], 1, sd, na.rm=TRUE)
+data.frame(my_mw_target4, mean=mymean, stdev=mystdev)[1:2,5:12] 
+
+
+plot(my_mw_target4[1:500,3:4], col="red")
+write.table(my_mw_target4, file="my_file.xls", quote=F, sep="\t", col.names = NA) 
